@@ -31,7 +31,31 @@ async function run() {
         await client.connect()
 
         const db = client.db('BloodBridgeDB');
+        const allDivisions = db.collection('division-names');
+        const allDistricts = db.collection('district-names');
         const usersCollection = db.collection('users-data');
+
+
+        // APIs for get divisions
+        app.get('/all-divisions', async (req, res) => {
+            const result = await (allDivisions.find()).toArray();
+            res.send(result);
+        })
+
+        // APIs for get districts by division
+        app.get('/districts', async (req, res) => {
+            const { divisionId } = req.query;
+            if (!divisionId) {
+                return res.status(400).send({ message: 'Division Id is required' });
+            }
+
+            const districts = await allDistricts
+                .find({ division_id: divisionId })
+                .toArray();
+
+            res.send(districts)
+        })
+
 
 
         // User APIs
@@ -48,7 +72,7 @@ async function run() {
             const newUser = {
                 name: name || "Your Name",
                 email,
-                image: image || "/default-Profile.png",
+                photoURL: image || "/default-Profile.png",
                 bloodGroup,
                 division,
                 district,
