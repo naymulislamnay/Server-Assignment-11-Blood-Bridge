@@ -33,6 +33,7 @@ async function run() {
         const db = client.db('BloodBridgeDB');
         const allDivisions = db.collection('division-names');
         const allDistricts = db.collection('district-names');
+        const allUpazilas = db.collection('upazila-names');
         const usersCollection = db.collection('users-data');
 
 
@@ -56,12 +57,27 @@ async function run() {
             res.send(districts)
         })
 
+        // APIs for get upazilas by district
+        app.get('/upazilas', async (req, res) => {
+            const { districtId } = req.query;
+
+            if (!districtId) {
+                return res.status(400).send({ message: 'District Id is required' });
+            }
+
+            const upazilas = await allUpazilas
+                .find({ district_id: districtId })
+                .toArray();
+
+            res.send(upazilas);
+        });
+
 
 
         // User APIs
         // Create New User
         app.post('/users', async (req, res) => {
-            const { name, email, image, bloodGroup, division, district, role, status } = req.body;
+            const { name, email, image, bloodGroup, division, district, upazila, role, status } = req.body;
             const query = { email };
             const existingUser = await usersCollection.findOne(query);
 
@@ -76,6 +92,7 @@ async function run() {
                 bloodGroup,
                 division,
                 district,
+                upazila,
                 role: role || "donor",
                 status: true,
                 createdAt: new Date()
@@ -116,7 +133,7 @@ async function run() {
         // APIs for Update user Data
         app.patch('/user/:email', async (req, res) => {
             const email = req.params.email;
-            const { name, image, bloodGroup, division, district } = req.body;
+            const { name, image, bloodGroup, division, district, upazila } = req.body;
 
             const query = { email };
             const update = {
@@ -125,7 +142,8 @@ async function run() {
                     ...(image && { image }),
                     ...(bloodGroup && { bloodGroup }),
                     ...(division && { division }),
-                    ...(district && { district })
+                    ...(district && { district }),
+                    ...(upazila && { upazila })
                 }
             };
 
