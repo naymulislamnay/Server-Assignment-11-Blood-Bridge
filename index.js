@@ -84,6 +84,20 @@ async function run() {
             res.send(result);
         });
 
+        // Get user by email
+        app.get('/user/:email', async (req, res) => {
+            const email = req.params.email;
+
+            const user = await usersCollection.findOne({ email });
+
+            if (!user) {
+                return res.status(404).send({ message: 'User not found' });
+            }
+
+            res.send(user);
+        });
+
+
         // Get All the Users Based on BloodGroup
         app.get('/users', async (req, res) => {
             const { bloodGroup } = req.query;
