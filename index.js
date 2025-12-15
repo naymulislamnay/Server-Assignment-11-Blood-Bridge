@@ -133,13 +133,13 @@ async function run() {
         // APIs for Update user Data
         app.patch('/user/:email', async (req, res) => {
             const email = req.params.email;
-            const { name, image, bloodGroup, division, district, upazila } = req.body;
+            const { name, photoURL, bloodGroup, division, district, upazila } = req.body;
 
             const query = { email };
             const update = {
                 $set: {
                     ...(name && { name }),
-                    ...(image && { image }),
+                    ...(photoURL && { photoURL }),
                     ...(bloodGroup && { bloodGroup }),
                     ...(division && { division }),
                     ...(district && { district }),
